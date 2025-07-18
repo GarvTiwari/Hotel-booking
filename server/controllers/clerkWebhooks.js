@@ -3,7 +3,8 @@ import { Webhook } from "svix";
 
 const clerkWebhooks = async (req, res) => {
   try {
-    const whookk = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
+    const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
+    console.log(whook);
 
     const headers = {
       "svix-id": req.headers["svix-id"],
@@ -20,6 +21,12 @@ const clerkWebhooks = async (req, res) => {
       username: data.first_name + " " + data.last_name,
       image: data.image_url,
     };
+
+console.log("Webhook type:", type);
+console.log("User Data:", userData); 
+
+
+
 
     // Switch Cases for different Events
     switch(type){
