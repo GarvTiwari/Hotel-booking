@@ -80,22 +80,38 @@ const clerkWebhooks = async (req, res) => {
     };
 
     // ✅ Verify raw body
-    const evt = await whook.verify(req.body, headers);
+
+    const evt = await whook.verify(req.body.toString("utf8"), headers);
+
+// const evt = await whook.verify(req.body.toString(), headers);
+
+    //  const evt = await whook.verify(req.body, headers);
     const { data, type } = evt;
 
     // ✅ Build userData safely
     const userData = {
-      _id: data.id,
+       _id: data.id,
       email: data.email_addresses?.[0]?.email_address || "",
       username: `${data.first_name || ""} ${data.last_name || ""}`.trim(),
       image: data.image_url || "",
     };
 
     switch (type) {
+      // case "user.created":
+      //   console.log("Saving user to MongoDB...");
+      //   await User.create(userData);
+      //   console.log("✅ User saved.");
+      //   break;
+
+
       case "user.created":
-        console.log("Saving user to MongoDB...");
-        await User.create(userData);
-        console.log("✅ User saved.");
+        console.log("➡️ Clerk user.created event received");
+        await User.findByIdAndUpdate(
+          data.id,
+          userData,
+          { upsert: true, new: true, setDefaultsOnInsert: true }
+        );
+        console.log("✅ User saved/updated");
         break;
 
       case "user.updated":
